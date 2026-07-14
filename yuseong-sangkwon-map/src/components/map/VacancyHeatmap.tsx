@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { Circle, Popup } from 'react-leaflet'
 import type { Tables } from '@/types/database'
-import type { KakaoMap as KakaoMapInstance, KakaoCustomOverlay } from '@/lib/kakao/types'
 
 const DONG_CENTERS: Record<string, { lat: number; lng: number }> = {
   관평동: { lat: 36.4327, lng: 127.3856 },
@@ -22,7 +21,6 @@ const DONG_CENTERS: Record<string, { lat: number; lng: number }> = {
 }
 
 interface VacancyHeatmapProps {
-  map: KakaoMapInstance | null
   districts: Tables<'districts'>[]
   visible: boolean
 }
@@ -33,47 +31,35 @@ function vacancyColor(rate: number): string {
   return '#EF4444'
 }
 
-export function VacancyHeatmap({ map, districts, visible }: VacancyHeatmapProps) {
-  const overlaysRef = useRef<KakaoCustomOverlay[]>([])
+export function VacancyHeatmap({ districts, visible }: VacancyHeatmapProps) {
+  if (!visible) return null
 
-  useEffect(() => {
-    if (!map || !window.kakao) return
+  return (
+    <>
+      {districts.map((district) => {
+        const center = DONG_CENTERS[district.name]
+        if (!center) return null
 
-    overlaysRef.current.forEach((overlay) => overlay.setMap(null))
-    overlaysRef.current = []
+        const color = vacancyColor(district.vacancy_rate)
 
-    if (!visible) return
-
-    districts.forEach((district) => {
-      const center = DONG_CENTERS[district.name]
-      if (!center) return
-
-      const position = new window.kakao.maps.LatLng(center.lat, center.lng)
-      const color = vacancyColor(district.vacancy_rate)
-
-      const content = document.createElement('div')
-      content.style.cssText = `
-        padding: 4px 10px;
-        border-radius: 9999px;
-        background: ${color};
-        color: white;
-        font-size: 11px;
-        font-weight: 600;
-        white-space: nowrap;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-      `
-      content.innerText = `${district.name} ${district.vacancy_rate.toFixed(1)}%`
-
-      const overlay = new window.kakao.maps.CustomOverlay({
-        position,
-        content,
-        zIndex: 5,
-      })
-
-      overlay.setMap(map)
-      overlaysRef.current.push(overlay)
-    })
-  }, [map, districts, visible])
-
-  return null
+        return (
+          <Circle
+            key={district.id}
+            center={[center.lat, center.lng]}
+            radius={400}
+            pathOptions={{
+              color,
+              weight: 1,
+              fillColor: color,
+              fillOpacity: 0.5,
+            }}
+          >
+            <Popup>
+              {district.name} 공실률 {district.vacancy_rate.toFixed(1)}%
+            </Popup>
+          </Circle>
+        )
+      })}
+    </>
+  )
 }

@@ -19,10 +19,6 @@ export default function RootLayout({
           src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
           strategy="beforeInteractive"
         />
-        <Script
-          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&autoload=false`}
-          strategy="beforeInteractive"
-        />
       </head>
       <body>{children}</body>
     </html>
