@@ -7,8 +7,18 @@ import { createClient } from '@/lib/supabase/client'
 import { KakaoMap } from '@/components/map/KakaoMap'
 import { StoreCard } from '@/components/map/StoreCard'
 import { CategoryFilter } from '@/components/map/CategoryFilter'
+import { LayerControl, type MapLayer } from '@/components/map/LayerControl'
+import { VacancyHeatmap } from '@/components/map/VacancyHeatmap'
 import { useStores } from '@/hooks/useStores'
+import { useDistricts } from '@/hooks/useDistricts'
 import type { Tables } from '@/types/database'
+import type { KakaoMap as KakaoMapInstance } from '@/lib/kakao/types'
+
+function formatHour(hour: number): string {
+  const period = hour < 12 ? '오전' : '오후'
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12
+  return `${period} ${displayHour}시`
+}
 
 export default function MapPage() {
   const router = useRouter()
@@ -16,8 +26,12 @@ export default function MapPage() {
   const [categories, setCategories] = useState<Tables<'categories'>[]>([])
   const [selectedStore, setSelectedStore] = useState<Tables<'stores'> | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>('all')
+  const [activeLayer, setActiveLayer] = useState<MapLayer>('none')
+  const [timeSlot, setTimeSlot] = useState(9)
+  const [mapInstance, setMapInstance] = useState<KakaoMapInstance | null>(null)
 
   const { stores } = useStores(selectedCategory)
+  const { districts } = useDistricts()
 
   useEffect(() => {
     const supabase = createClient()
@@ -37,8 +51,20 @@ export default function MapPage() {
   return (
     <div className="relative h-screen w-screen overflow-hidden">
       <div className="absolute inset-0">
-        <KakaoMap stores={stores} onSelectStore={setSelectedStore} />
+        <KakaoMap
+          stores={stores}
+          categories={categories}
+          activeLayer={activeLayer}
+          onSelectStore={setSelectedStore}
+          onMapReady={setMapInstance}
+        />
       </div>
+
+      <VacancyHeatmap
+        map={mapInstance}
+        districts={districts}
+        visible={activeLayer === 'vacancy'}
+      />
 
       <header className="absolute left-0 top-0 z-10 flex w-full items-center justify-between bg-white/95 px-4 py-3 shadow-sm">
         <span className="text-lg font-bold text-gray-900">유성구 상권 지도</span>
@@ -59,7 +85,25 @@ export default function MapPage() {
         </div>
       </header>
 
+      <LayerControl activeLayer={activeLayer} onLayerChange={setActiveLayer} />
+
       <div className="absolute bottom-0 left-0 z-10 w-full bg-white/95 shadow-[0_-1px_4px_rgba(0,0,0,0.08)]">
+        {activeLayer === 'population' && (
+          <div className="border-b border-gray-100 px-4 py-3">
+            <div className="mb-1 text-center text-sm font-medium text-gray-700">
+              {formatHour(timeSlot)}
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={23}
+              value={timeSlot}
+              onChange={(e) => setTimeSlot(Number(e.target.value))}
+              className="w-full"
+            />
+          </div>
+        )}
+
         <CategoryFilter
           categories={categories}
           selected={selectedCategory}

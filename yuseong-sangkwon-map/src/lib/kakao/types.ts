@@ -8,6 +8,7 @@ declare global {
         LatLng: new (lat: number, lng: number) => KakaoLatLng
         Marker: new (options: KakaoMarkerOptions) => KakaoMarker
         InfoWindow: new (options: KakaoInfoWindowOptions) => KakaoInfoWindow
+        CustomOverlay: new (options: CustomOverlayOptions) => KakaoCustomOverlay
         event: {
           addListener: (target: unknown, type: string, handler: () => void) => void
         }
@@ -36,9 +37,20 @@ export interface KakaoMarkerOptions {
   position: KakaoLatLng
   map?: KakaoMap
   title?: string
+  opacity?: number
 }
 
 export interface KakaoMarker {
+  setMap: (map: KakaoMap | null) => void
+}
+
+export interface CustomOverlayOptions {
+  position: KakaoLatLng
+  content: string | HTMLElement
+  zIndex?: number
+}
+
+export interface KakaoCustomOverlay {
   setMap: (map: KakaoMap | null) => void
 }
 
