@@ -9,8 +9,10 @@ import { StoreCard } from '@/components/map/StoreCard'
 import { CategoryFilter } from '@/components/map/CategoryFilter'
 import { LayerControl, type MapLayer } from '@/components/map/LayerControl'
 import { VacancyHeatmap } from '@/components/map/VacancyHeatmap'
+import { RadiusAnalysis } from '@/components/map/RadiusAnalysis'
 import { useStores } from '@/hooks/useStores'
 import { useDistricts } from '@/hooks/useDistricts'
+import { analyzeRadius, type RadiusResult } from '@/lib/analysis/radius'
 import type { Tables } from '@/types/database'
 import type { KakaoMap as KakaoMapInstance } from '@/lib/kakao/types'
 
@@ -29,6 +31,11 @@ export default function MapPage() {
   const [activeLayer, setActiveLayer] = useState<MapLayer>('none')
   const [timeSlot, setTimeSlot] = useState(9)
   const [mapInstance, setMapInstance] = useState<KakaoMapInstance | null>(null)
+  const [analysisCenter, setAnalysisCenter] = useState<{ lat: number; lng: number } | null>(
+    null
+  )
+  const [analysisRadius, setAnalysisRadius] = useState<300 | 500 | 1000>(500)
+  const [analysisResult, setAnalysisResult] = useState<RadiusResult | null>(null)
 
   const { stores } = useStores(selectedCategory)
   const { districts } = useDistricts()
@@ -48,6 +55,29 @@ export default function MapPage() {
     router.push('/auth/login')
   }, [router])
 
+  const handleMapClick = useCallback(
+    (latlng: { lat: number; lng: number }) => {
+      setAnalysisCenter(latlng)
+      setAnalysisResult(analyzeRadius(latlng, analysisRadius, stores))
+    },
+    [analysisRadius, stores]
+  )
+
+  const handleRadiusChange = useCallback(
+    (r: 300 | 500 | 1000) => {
+      setAnalysisRadius(r)
+      if (analysisCenter) {
+        setAnalysisResult(analyzeRadius(analysisCenter, r, stores))
+      }
+    },
+    [analysisCenter, stores]
+  )
+
+  const handleAnalysisClose = useCallback(() => {
+    setAnalysisCenter(null)
+    setAnalysisResult(null)
+  }, [])
+
   return (
     <div className="relative h-screen w-screen overflow-hidden">
       <div className="absolute inset-0">
@@ -57,6 +87,9 @@ export default function MapPage() {
           activeLayer={activeLayer}
           onSelectStore={setSelectedStore}
           onMapReady={setMapInstance}
+          onMapClick={handleMapClick}
+          analysisCenter={analysisCenter}
+          analysisRadius={analysisRadius}
         />
       </div>
 
@@ -115,6 +148,15 @@ export default function MapPage() {
         store={selectedStore}
         categories={categories}
         onClose={() => setSelectedStore(null)}
+      />
+
+      <RadiusAnalysis
+        center={analysisCenter}
+        radiusMeters={analysisRadius}
+        onRadiusChange={handleRadiusChange}
+        result={analysisResult}
+        categories={categories}
+        onClose={handleAnalysisClose}
       />
     </div>
   )

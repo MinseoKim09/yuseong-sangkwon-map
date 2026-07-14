@@ -9,8 +9,13 @@ declare global {
         Marker: new (options: KakaoMarkerOptions) => KakaoMarker
         InfoWindow: new (options: KakaoInfoWindowOptions) => KakaoInfoWindow
         CustomOverlay: new (options: CustomOverlayOptions) => KakaoCustomOverlay
+        Circle: new (options: KakaoCircleOptions) => KakaoCircle
         event: {
-          addListener: (target: unknown, type: string, handler: () => void) => void
+          addListener: (
+            target: unknown,
+            type: string,
+            handler: (mouseEvent: KakaoMouseEvent) => void
+          ) => void
         }
       }
     }
@@ -33,6 +38,10 @@ export interface KakaoLatLng {
   getLng: () => number
 }
 
+export interface KakaoMouseEvent {
+  latLng: KakaoLatLng
+}
+
 export interface KakaoMarkerOptions {
   position: KakaoLatLng
   map?: KakaoMap
@@ -51,6 +60,20 @@ export interface CustomOverlayOptions {
 }
 
 export interface KakaoCustomOverlay {
+  setMap: (map: KakaoMap | null) => void
+}
+
+export interface KakaoCircleOptions {
+  center: KakaoLatLng
+  radius: number
+  strokeWeight?: number
+  strokeColor?: string
+  strokeOpacity?: number
+  fillColor?: string
+  fillOpacity?: number
+}
+
+export interface KakaoCircle {
   setMap: (map: KakaoMap | null) => void
 }
 
