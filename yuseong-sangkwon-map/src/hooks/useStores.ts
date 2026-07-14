@@ -9,36 +9,55 @@ interface UseStoresResult {
   refetch: () => void
 }
 
+const storesCache = new Map<string, Tables<'stores'>[]>()
+
 export function useStores(category?: string | null): UseStoresResult {
-  const [stores, setStores] = useState<Tables<'stores'>[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const cacheKey = category ?? 'all'
+
+  const [stores, setStores] = useState<Tables<'stores'>[]>(storesCache.get(cacheKey) ?? [])
+  const [isLoading, setIsLoading] = useState(!storesCache.has(cacheKey))
   const [error, setError] = useState<string | null>(null)
 
-  const fetchStores = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
+  const fetchStores = useCallback(
+    async (force = false) => {
+      if (!force && storesCache.has(cacheKey)) {
+        setStores(storesCache.get(cacheKey)!)
+        setIsLoading(false)
+        return
+      }
 
-    const supabase = createClient()
-    let query = supabase.from('stores').select('*')
+      setIsLoading(true)
+      setError(null)
 
-    if (category && category !== 'all') {
-      query = query.eq('category', category)
-    }
+      const supabase = createClient()
+      let query = supabase.from('stores').select('*')
 
-    const { data, error: fetchError } = await query
+      if (category && category !== 'all') {
+        query = query.eq('category', category)
+      }
 
-    if (fetchError) {
-      setError(fetchError.message)
-    } else {
-      setStores(data ?? [])
-    }
+      const { data, error: fetchError } = await query
 
-    setIsLoading(false)
-  }, [category])
+      if (fetchError) {
+        setError(fetchError.message)
+      } else {
+        const result = data ?? []
+        storesCache.set(cacheKey, result)
+        setStores(result)
+      }
+
+      setIsLoading(false)
+    },
+    [category, cacheKey]
+  )
 
   useEffect(() => {
     fetchStores()
   }, [fetchStores])
 
-  return { stores, isLoading, error, refetch: fetchStores }
+  const refetch = useCallback(() => {
+    fetchStores(true)
+  }, [fetchStores])
+
+  return { stores, isLoading, error, refetch }
 }
