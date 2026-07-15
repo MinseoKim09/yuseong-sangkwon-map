@@ -82,6 +82,14 @@ export default function MapPage() {
     }
   }, [user, router])
 
+  const handleMarketingClick = useCallback(() => {
+    if (user) {
+      router.push('/marketing')
+    } else {
+      router.push('/auth/login')
+    }
+  }, [user, router])
+
   const handleMapClick = useCallback(
     (latlng: { lat: number; lng: number }) => {
       setAnalysisCenter(latlng)
@@ -137,6 +145,14 @@ export default function MapPage() {
             className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             가게 등록
+          </button>
+          <button
+            type="button"
+            onClick={handleMarketingClick}
+            disabled={isAuthLoading}
+            className="rounded-md border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            AI 마케팅
           </button>
           <button
             type="button"
