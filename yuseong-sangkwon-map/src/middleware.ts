@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { type CookieOptions } from '@supabase/ssr'
 
-const PROTECTED_PATHS = ['/dashboard', '/stores/new']
+const PROTECTED_PATHS = ['/dashboard', '/stores/new', '/marketing']
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -44,5 +44,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/stores/new/:path*'],
+  matcher: ['/dashboard/:path*', '/stores/new/:path*', '/marketing/:path*'],
 }
