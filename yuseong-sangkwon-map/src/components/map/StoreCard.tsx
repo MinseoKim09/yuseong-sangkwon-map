@@ -13,7 +13,7 @@ export function StoreCard({ store, categories, onClose }: StoreCardProps) {
 
   return (
     <div
-      className={`fixed right-0 top-0 z-20 h-full w-80 overflow-y-auto bg-white shadow-xl transition-transform duration-300 ${
+      className={`fixed right-0 top-0 z-[1001] h-full w-80 overflow-y-auto bg-white shadow-xl transition-transform duration-300 ${
         store ? 'translate-x-0' : 'translate-x-full'
       }`}
     >

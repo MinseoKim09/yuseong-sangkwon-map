@@ -134,6 +134,7 @@ export interface Database {
           name: string
           vacancy_rate: number
           total_stores: number
+          hourly_population: Json
           updated_at: string
         }
         Insert: {
@@ -141,6 +142,7 @@ export interface Database {
           name: string
           vacancy_rate?: number
           total_stores?: number
+          hourly_population?: Json
           updated_at?: string
         }
         Update: {
@@ -148,6 +150,7 @@ export interface Database {
           name?: string
           vacancy_rate?: number
           total_stores?: number
+          hourly_population?: Json
           updated_at?: string
         }
         Relationships: []

@@ -32,7 +32,7 @@ export function RadiusAnalysis({
 
   return (
     <div
-      className={`fixed left-0 top-0 z-20 h-full w-72 overflow-y-auto bg-white shadow-xl transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-[1001] h-full w-72 overflow-y-auto bg-white shadow-xl transition-transform duration-300 ${
         center ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
