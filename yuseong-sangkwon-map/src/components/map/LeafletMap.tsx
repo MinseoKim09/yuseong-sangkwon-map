@@ -14,6 +14,7 @@ interface LeafletMapProps {
   onMapClick?: (latlng: { lat: number; lng: number }) => void
   analysisCenter?: { lat: number; lng: number } | null
   analysisRadius?: number
+  timeSlot?: number
   children?: ReactNode
 }
 
@@ -96,6 +97,7 @@ export default function LeafletMap({
   onMapClick,
   analysisCenter,
   analysisRadius,
+  timeSlot,
   children,
 }: LeafletMapProps) {
   const [mapType, setMapType] = useState<MapType>('normal')
@@ -135,11 +137,18 @@ export default function LeafletMap({
             )
           }
 
+          let opacity = 1
+          if (activeLayer === 'vacancy') {
+            opacity = 0.3
+          } else if (activeLayer === 'population' && timeSlot !== undefined) {
+            opacity = timeSlot >= 9 && timeSlot <= 18 ? 1 : 0.3
+          }
+
           return (
             <Marker
               key={store.id}
               position={[store.lat, store.lng]}
-              icon={createDivIcon('#3B82F6', 12, activeLayer === 'vacancy' ? 0.3 : 1)}
+              icon={createDivIcon('#3B82F6', 12, opacity)}
               eventHandlers={{ click: () => onSelectStore(store) }}
             />
           )
