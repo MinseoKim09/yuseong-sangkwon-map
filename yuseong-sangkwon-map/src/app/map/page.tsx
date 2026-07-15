@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
+import type { User } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/client'
 import { StoreCard } from '@/components/map/StoreCard'
 import { CategoryFilter } from '@/components/map/CategoryFilter'
 import { LayerControl, type MapLayer } from '@/components/map/LayerControl'
@@ -19,6 +20,10 @@ const VacancyHeatmap = dynamic(
   () => import('@/components/map/VacancyHeatmap').then((mod) => mod.VacancyHeatmap),
   { ssr: false }
 )
+const PopulationHeatmap = dynamic(
+  () => import('@/components/map/PopulationHeatmap').then((mod) => mod.PopulationHeatmap),
+  { ssr: false }
+)
 
 function formatHour(hour: number): string {
   const period = hour < 12 ? '오전' : '오후'
@@ -29,6 +34,8 @@ function formatHour(hour: number): string {
 export default function MapPage() {
   const router = useRouter()
 
+  const [user, setUser] = useState<User | null>(null)
+  const [isAuthLoading, setIsAuthLoading] = useState(true)
   const [selectedStore, setSelectedStore] = useState<Tables<'stores'> | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>('all')
   const [activeLayer, setActiveLayer] = useState<MapLayer>('none')
@@ -43,10 +50,37 @@ export default function MapPage() {
   const { categories } = useCategories()
   const { districts } = useDistricts()
 
+  useEffect(() => {
+    const supabase = createClient()
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      setIsAuthLoading(false)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
   const handleLogout = useCallback(async () => {
     await fetch('/auth/logout', { method: 'POST' })
     router.push('/auth/login')
   }, [router])
+
+  const handleRegisterClick = useCallback(() => {
+    console.log('가게 등록 클릭, user:', user)
+
+    if (user) {
+      router.push('/stores/new')
+    } else {
+      router.push('/auth/login')
+    }
+  }, [user, router])
 
   const handleMapClick = useCallback(
     (latlng: { lat: number; lng: number }) => {
@@ -82,20 +116,28 @@ export default function MapPage() {
           onMapClick={handleMapClick}
           analysisCenter={analysisCenter}
           analysisRadius={analysisRadius}
+          timeSlot={timeSlot}
         >
           <VacancyHeatmap districts={districts} visible={activeLayer === 'vacancy'} />
+          <PopulationHeatmap
+            districts={districts}
+            timeSlot={timeSlot}
+            visible={activeLayer === 'population'}
+          />
         </LeafletMap>
       </div>
 
       <header className="absolute left-0 top-0 z-[1001] flex w-full items-center justify-between bg-white/95 px-4 py-3 shadow-sm">
         <span className="text-lg font-bold text-gray-900">유성구 상권 지도</span>
         <div className="flex gap-2">
-          <Link
-            href="/stores/new"
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          <button
+            type="button"
+            onClick={handleRegisterClick}
+            disabled={isAuthLoading}
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             가게 등록
-          </Link>
+          </button>
           <button
             type="button"
             onClick={handleLogout}

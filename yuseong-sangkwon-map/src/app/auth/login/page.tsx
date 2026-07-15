@@ -21,13 +21,14 @@ export default function LoginPage() {
     setIsLoading(true)
 
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-
     if (error) {
-      setError('이메일 또는 비밀번호가 올바르지 않습니다.')
+      setError(error.message)
       setIsLoading(false)
       return
     }
 
+    // 세션 쿠키가 완전히 설정될 때까지 잠깐 대기
+    await new Promise(resolve => setTimeout(resolve, 500))
     router.push('/map')
     router.refresh()
   }

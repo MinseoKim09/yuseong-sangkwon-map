@@ -1,17 +1,17 @@
 'use client'
 
-import { useState, useEffect, FormEvent } from 'react'
+import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { AuthInput, AuthButton } from '@/components/ui/AuthForm'
 import { AddressSearch, type AddressResult } from '@/components/map/AddressSearch'
-import type { Tables } from '@/types/database'
+import { useCategories } from '@/hooks/useCategories'
 
 export default function NewStorePage() {
   const router = useRouter()
   const supabase = createClient()
 
-  const [categories, setCategories] = useState<Tables<'categories'>[]>([])
+  const { categories } = useCategories()
   const [name, setName] = useState('')
   const [category, setCategory] = useState('')
   const [phone, setPhone] = useState('')
@@ -23,15 +23,6 @@ export default function NewStorePage() {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    supabase
-      .from('categories')
-      .select('*')
-      .then(({ data }) => {
-        if (data) setCategories(data)
-      })
-  }, [supabase])
 
   const handleAddressSelect = (result: AddressResult) => {
     setAddress(result.address)
@@ -73,7 +64,8 @@ export default function NewStorePage() {
           return
         }
 
-        const path = `${user.id}/${Date.now()}_${imageFile.name}`
+        const fileExt = imageFile.name.split('.').pop()
+        const path = `${user.id}/${Date.now()}.${fileExt}`
 
         // 'store-images' 버킷은 Supabase 대시보드에서 public 버킷으로 미리 생성해야 합니다.
         const { error: uploadError } = await supabase.storage
