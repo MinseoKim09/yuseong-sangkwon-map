@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { AuthInput, AuthButton } from '@/components/ui/AuthForm'
 
@@ -9,6 +10,7 @@ type SignupRole = 'owner' | 'entrepreneur'
 
 export default function SignupPage() {
   const supabase = createClient()
+  const router = useRouter()
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -16,7 +18,6 @@ export default function SignupPage() {
   const [role, setRole] = useState<SignupRole>('owner')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -32,25 +33,27 @@ export default function SignupPage() {
       },
     })
 
-    setIsLoading(false)
-
     if (error) {
+      setIsLoading(false)
       setError(error.message)
       return
     }
 
-    setIsSubmitted(true)
-  }
+    // 회원가입 성공 후 자동 로그인
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-  if (isSubmitted) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-        <div className="w-full max-w-sm rounded-lg bg-white p-8 text-center shadow-sm">
-          <h1 className="mb-2 text-xl font-bold text-gray-900">가입 신청 완료</h1>
-          <p className="text-sm text-gray-600">이메일을 확인해주세요.</p>
-        </div>
-      </div>
-    )
+    setIsLoading(false)
+
+    if (signInError) {
+      setError(signInError.message)
+      return
+    }
+
+    router.push('/map')
+    router.refresh()
   }
 
   return (
