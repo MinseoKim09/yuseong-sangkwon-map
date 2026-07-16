@@ -12,14 +12,14 @@ export function CategoryFilter({ categories, selected, onSelect }: CategoryFilte
   const isAllSelected = selected === null || selected === 'all'
 
   return (
-    <div className="flex gap-2 overflow-x-auto px-4 py-3">
+    <div className="flex h-14 items-center gap-2 overflow-x-auto bg-white px-4 shadow-lg">
       <button
         type="button"
         onClick={() => onSelect('all')}
         className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
           isAllSelected
-            ? 'bg-gray-900 text-white'
-            : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+            ? 'bg-blue-600 text-white'
+            : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
         }`}
       >
         전체
@@ -36,7 +36,7 @@ export function CategoryFilter({ categories, selected, onSelect }: CategoryFilte
             className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               isSelected
                 ? 'text-white'
-                : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
             }`}
           >
             {c.label}

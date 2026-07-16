@@ -66,7 +66,7 @@ export function AddressSearch({ onSelect }: AddressSearchProps) {
         type="button"
         onClick={handleClick}
         disabled={isSearching}
-        className="whitespace-nowrap rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        className="whitespace-nowrap rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSearching ? '좌표 조회 중...' : '주소 검색'}
       </button>

@@ -25,6 +25,8 @@ const CONTENT_TYPES: { value: ContentType; label: string }[] = [
   { value: 'kakao', label: '카카오채널' },
 ]
 
+const DRAFT_NUMBERS = ['①', '②', '③', '④', '⑤']
+
 export function ContentGenerator({ store }: ContentGeneratorProps) {
   const [contentType, setContentType] = useState<ContentType>('instagram')
   const [description, setDescription] = useState('')
@@ -77,95 +79,112 @@ export function ContentGenerator({ store }: ContentGeneratorProps) {
   }
 
   return (
-    <div>
-      <div className="mb-4">
-        <span className="mb-1 block text-sm font-medium text-gray-700">콘텐츠 유형</span>
-        <div className="flex gap-2">
+    <>
+      <div className="mt-6 rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex border-b border-slate-200">
           {CONTENT_TYPES.map((type) => (
             <button
               key={type.value}
               type="button"
               onClick={() => setContentType(type.value)}
-              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              className={`-mb-px px-4 py-2 text-sm font-medium transition-colors ${
                 contentType === type.value
-                  ? 'bg-blue-600 text-white'
-                  : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               {type.label}
             </button>
           ))}
         </div>
+
+        <div className="mb-4">
+          <label className="mb-1 block text-sm font-medium text-slate-700">
+            오늘의 메뉴·특이사항 (선택)
+          </label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            placeholder="예: 오늘의 신메뉴 딸기 라떼 출시, 오후 2시까지 아메리카노 1+1"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {error && (
+          <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+            {error}
+          </p>
+        )}
+
+        <button
+          type="button"
+          onClick={handleGenerate}
+          disabled={isLoading || !store}
+          className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isLoading ? '생성 중...' : '콘텐츠 생성'}
+        </button>
+
+        {isLoading && (
+          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-slate-500">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600" />
+            AI가 콘텐츠를 생성하고 있어요...
+          </div>
+        )}
       </div>
-
-      <div className="mb-4">
-        <label className="mb-1 block text-sm font-medium text-gray-700">
-          오늘의 메뉴·특이사항 (선택)
-        </label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-          placeholder="예: 오늘의 신메뉴 딸기 라떼 출시, 오후 2시까지 아메리카노 1+1"
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
-        />
-      </div>
-
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-
-      <button
-        type="button"
-        onClick={handleGenerate}
-        disabled={isLoading || !store}
-        className="mb-6 w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {isLoading ? '생성 중...' : '콘텐츠 생성'}
-      </button>
 
       {result && (
-        <div className="space-y-4">
+        <div className="mt-6 space-y-4">
           {result.drafts.map((draft, index) => (
-            <div key={index} className="rounded-lg border border-gray-200 p-4 shadow-sm">
-              {draft.title && (
-                <h3 className="mb-2 text-sm font-bold text-gray-900">{draft.title}</h3>
-              )}
-              <p className="whitespace-pre-wrap text-sm text-gray-700">{draft.content}</p>
-              <button
-                type="button"
-                onClick={() =>
-                  handleCopy(
-                    draft.title ? `${draft.title}\n\n${draft.content}` : draft.content,
-                    index
-                  )
-                }
-                className="mt-3 rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-              >
-                {copiedIndex === index ? '복사됨!' : '복사'}
-              </button>
+            <div key={index} className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+              <div className="mb-2 flex items-start justify-between gap-2">
+                <div className="flex items-start gap-2">
+                  <span className="text-lg font-semibold text-blue-600">
+                    {DRAFT_NUMBERS[index] ?? index + 1}
+                  </span>
+                  {draft.title && (
+                    <h3 className="text-sm font-bold text-slate-900">{draft.title}</h3>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleCopy(
+                      draft.title ? `${draft.title}\n\n${draft.content}` : draft.content,
+                      index
+                    )
+                  }
+                  className="shrink-0 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                >
+                  {copiedIndex === index ? '복사됨 ✓' : '복사 📋'}
+                </button>
+              </div>
+              <p className="whitespace-pre-wrap text-sm text-slate-700">{draft.content}</p>
             </div>
           ))}
 
           {result.hashtags && result.hashtags.length > 0 && (
-            <div className="rounded-lg border border-gray-200 p-4 shadow-sm">
+            <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
               <div className="mb-2 flex items-center justify-between">
-                <h3 className="text-sm font-bold text-gray-900">해시태그</h3>
+                <h3 className="text-sm font-bold text-slate-900">해시태그</h3>
                 <button
                   type="button"
                   onClick={() =>
                     handleCopy(result.hashtags!.map((tag) => `#${tag}`).join(' '), -1)
                   }
-                  className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
                 >
-                  {copiedIndex === -1 ? '복사됨!' : '복사'}
+                  {copiedIndex === -1 ? '복사됨 ✓' : '복사 📋'}
                 </button>
               </div>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-slate-700">
                 {result.hashtags.map((tag) => `#${tag}`).join(' ')}
               </p>
             </div>
           )}
         </div>
       )}
-    </div>
+    </>
   )
 }

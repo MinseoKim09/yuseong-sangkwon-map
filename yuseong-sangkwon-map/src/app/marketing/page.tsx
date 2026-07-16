@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { useStores } from '@/hooks/useStores'
@@ -15,12 +16,12 @@ function StoreAndGenerator({ userId }: { userId: string }) {
 
   return (
     <>
-      <div className="mb-6">
-        <label className="mb-1 block text-sm font-medium text-gray-700">가게 선택</label>
+      <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+        <label className="mb-1 block text-sm font-medium text-slate-700">가게 선택</label>
         <select
           value={selectedStoreId}
           onChange={(e) => setSelectedStoreId(e.target.value)}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"
         >
           <option value="">{isLoading ? '불러오는 중...' : '가게를 선택해주세요'}</option>
           {stores.map((store) => (
@@ -30,7 +31,7 @@ function StoreAndGenerator({ userId }: { userId: string }) {
           ))}
         </select>
         {!isLoading && stores.length === 0 && (
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-slate-500">
             등록된 가게가 없습니다. 먼저 가게를 등록해주세요.
           </p>
         )}
@@ -73,7 +74,7 @@ export default function MarketingPage() {
 
   if (isAuthLoading || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-gray-500">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500">
         불러오는 중...
       </div>
     )
@@ -81,7 +82,15 @@ export default function MarketingPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">AI 마케팅 어시스턴트</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-900">✨ AI 마케팅 어시스턴트</h1>
+        <Link
+          href="/map"
+          className="text-sm text-slate-500 transition-colors hover:text-slate-700"
+        >
+          ← 지도로
+        </Link>
+      </div>
       <StoreAndGenerator userId={user.id} />
     </div>
   )
