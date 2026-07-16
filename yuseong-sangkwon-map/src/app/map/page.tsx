@@ -135,14 +135,14 @@ export default function MapPage() {
         </LeafletMap>
       </div>
 
-      <header className="absolute left-0 top-0 z-[1001] flex w-full items-center justify-between bg-white/95 px-4 py-3 shadow-sm">
-        <span className="text-lg font-bold text-gray-900">유성구 상권 지도</span>
+      <header className="absolute left-0 top-0 z-[1001] flex h-14 w-full items-center justify-between bg-white px-4 shadow-sm">
+        <span className="text-lg font-bold text-blue-600">유성구 상권지도</span>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={handleRegisterClick}
             disabled={isAuthLoading}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             가게 등록
           </button>
@@ -150,14 +150,14 @@ export default function MapPage() {
             type="button"
             onClick={handleMarketingClick}
             disabled={isAuthLoading}
-            className="rounded-md border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
             AI 마케팅
           </button>
           <button
             type="button"
             onClick={handleLogout}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
           >
             로그아웃
           </button>
@@ -166,10 +166,10 @@ export default function MapPage() {
 
       <LayerControl activeLayer={activeLayer} onLayerChange={setActiveLayer} />
 
-      <div className="absolute bottom-0 left-0 z-[1001] w-full bg-white/95 shadow-[0_-1px_4px_rgba(0,0,0,0.08)]">
+      <div className="absolute bottom-0 left-0 z-[1001] w-full">
         {activeLayer === 'population' && (
-          <div className="border-b border-gray-100 px-4 py-3">
-            <div className="mb-1 text-center text-sm font-medium text-gray-700">
+          <div className="border-b border-slate-100 bg-white px-4 py-3 shadow-sm">
+            <div className="mb-1 text-center text-sm font-medium text-slate-700">
               {formatHour(timeSlot)}
             </div>
             <input

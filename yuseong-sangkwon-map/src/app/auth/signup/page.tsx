@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { AuthInput, AuthButton } from '@/components/ui/AuthForm'
 
@@ -57,9 +57,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-sm">
-        <h1 className="mb-6 text-center text-2xl font-bold text-gray-900">회원가입</h1>
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
+        <p className="mb-6 text-center text-sm text-slate-500">🗺️ 유성구 상권지도</p>
+        <h1 className="mb-6 text-center text-xl font-bold text-slate-900">회원가입</h1>
 
         <form onSubmit={handleSubmit}>
           <AuthInput
@@ -88,9 +89,9 @@ export default function SignupPage() {
           />
 
           <div className="mb-4">
-            <span className="mb-1 block text-sm font-medium text-gray-700">역할</span>
+            <span className="mb-1 block text-sm font-medium text-slate-700">역할</span>
             <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input
                   type="radio"
                   name="role"
@@ -100,7 +101,7 @@ export default function SignupPage() {
                 />
                 소상공인
               </label>
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input
                   type="radio"
                   name="role"
@@ -113,14 +114,18 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+          {error && (
+            <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+              {error}
+            </p>
+          )}
 
           <AuthButton type="submit" isLoading={isLoading}>
             회원가입
           </AuthButton>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-4 text-center text-sm text-slate-500">
           이미 계정이 있으신가요?{' '}
           <Link href="/auth/login" className="font-medium text-blue-600 hover:underline">
             로그인

@@ -11,15 +11,13 @@ interface AuthInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'on
 export function AuthInput({ label, type, value, onChange, error, ...rest }: AuthInputProps) {
   return (
     <div className="mb-4">
-      <label className="mb-1 block text-sm font-medium text-gray-700">{label}</label>
+      <label className="mb-1 block text-sm font-medium text-slate-700">{label}</label>
       <input
         type={type}
         value={value}
         onChange={onChange}
-        className={`w-full rounded-md border px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 ${
-          error
-            ? 'border-red-500 focus:ring-red-200'
-            : 'border-gray-300 focus:ring-blue-200'
+        className={`w-full rounded-lg border px-3 py-2 text-sm text-slate-900 outline-none focus:border-transparent focus:ring-2 ${
+          error ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-blue-500'
         }`}
         {...rest}
       />
@@ -36,7 +34,7 @@ export function AuthButton({ isLoading, disabled, children, ...rest }: AuthButto
   return (
     <button
       disabled={isLoading || disabled}
-      className="w-full rounded-md bg-blue-600 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+      className="h-11 w-full rounded-lg bg-blue-600 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
       {...rest}
     >
       {isLoading ? '처리 중...' : children}

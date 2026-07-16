@@ -9,10 +9,18 @@ interface UseStoresResult {
   refetch: () => void
 }
 
+interface UseStoresOptions {
+  ownerId?: string | null
+}
+
 const storesCache = new Map<string, Tables<'stores'>[]>()
 
-export function useStores(category?: string | null): UseStoresResult {
-  const cacheKey = category ?? 'all'
+export function useStores(
+  category?: string | null,
+  options: UseStoresOptions = {}
+): UseStoresResult {
+  const { ownerId } = options
+  const cacheKey = `${category ?? 'all'}::${ownerId ?? 'any'}`
 
   const [stores, setStores] = useState<Tables<'stores'>[]>(storesCache.get(cacheKey) ?? [])
   const [isLoading, setIsLoading] = useState(!storesCache.has(cacheKey))
@@ -36,6 +44,10 @@ export function useStores(category?: string | null): UseStoresResult {
         query = query.eq('category', category)
       }
 
+      if (ownerId) {
+        query = query.eq('owner_id', ownerId)
+      }
+
       const { data, error: fetchError } = await query
 
       if (fetchError) {
@@ -48,7 +60,7 @@ export function useStores(category?: string | null): UseStoresResult {
 
       setIsLoading(false)
     },
-    [category, cacheKey]
+    [category, ownerId, cacheKey]
   )
 
   useEffect(() => {

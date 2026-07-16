@@ -34,9 +34,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-sm">
-        <h1 className="mb-6 text-center text-2xl font-bold text-gray-900">로그인</h1>
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
+        <p className="mb-6 text-center text-sm text-slate-500">🗺️ 유성구 상권지도</p>
+        <h1 className="mb-6 text-center text-xl font-bold text-slate-900">로그인</h1>
 
         <form onSubmit={handleSubmit}>
           <AuthInput
@@ -56,14 +57,18 @@ export default function LoginPage() {
             autoComplete="current-password"
           />
 
-          {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+          {error && (
+            <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+              {error}
+            </p>
+          )}
 
           <AuthButton type="submit" isLoading={isLoading}>
             로그인
           </AuthButton>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-4 text-center text-sm text-slate-500">
           계정이 없으신가요?{' '}
           <Link href="/auth/signup" className="font-medium text-blue-600 hover:underline">
             회원가입

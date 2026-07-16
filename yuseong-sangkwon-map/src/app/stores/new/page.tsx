@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { AuthInput, AuthButton } from '@/components/ui/AuthForm'
 import { AddressSearch, type AddressResult } from '@/components/map/AddressSearch'
@@ -115,9 +116,18 @@ export default function NewStorePage() {
 
   return (
     <div className="mx-auto max-w-lg px-4 py-10">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">가게 등록</h1>
+      <Link
+        href="/map"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-700"
+      >
+        ← 지도로
+      </Link>
+
+      <h1 className="mb-6 text-2xl font-bold text-slate-900">가게 등록</h1>
 
       <form onSubmit={handleSubmit}>
+        <h2 className="mb-3 text-lg font-semibold text-slate-900">기본정보</h2>
+
         <AuthInput
           label="가게명"
           type="text"
@@ -127,11 +137,11 @@ export default function NewStorePage() {
         />
 
         <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium text-gray-700">업종</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">업종</label>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"
           >
             <option value="">선택해주세요</option>
             {categories.map((c) => (
@@ -150,38 +160,48 @@ export default function NewStorePage() {
         />
 
         <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium text-gray-700">소개</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">소개</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={200}
             rows={4}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"
           />
-          <p className="mt-1 text-right text-xs text-gray-400">{description.length}/200</p>
+          <p className="mt-1 text-right text-xs text-slate-400">{description.length}/200</p>
         </div>
 
+        <hr className="my-6 border-slate-200" />
+        <h2 className="mb-3 text-lg font-semibold text-slate-900">위치</h2>
+
         <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium text-gray-700">주소</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">주소</label>
           <div className="flex items-center gap-2">
             <AddressSearch onSelect={handleAddressSelect} />
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-slate-600">
               {roadAddress || address || '주소를 검색해주세요'}
             </span>
           </div>
         </div>
 
-        <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium text-gray-700">대표 사진</label>
+        <hr className="my-6 border-slate-200" />
+        <h2 className="mb-3 text-lg font-semibold text-slate-900">사진</h2>
+
+        <div className="mb-6">
+          <label className="mb-1 block text-sm font-medium text-slate-700">대표 사진</label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
-            className="w-full text-sm text-gray-700"
+            className="w-full text-sm text-slate-700"
           />
         </div>
 
-        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+        {error && (
+          <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+            {error}
+          </p>
+        )}
 
         <AuthButton type="submit" isLoading={isLoading}>
           등록하기
